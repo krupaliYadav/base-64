@@ -11,14 +11,15 @@ const covertImageToBase64 = async (req, res) => {
 
     // Convert the image to a Base64 string
     const base64String = Buffer.from(image).toString('base64');
-    res.status(200).json({ status: 200, success: true, message: 'Convert image to base64 successfully.', base64String })
+    const dataUrl = `data:image/${path.extname(imagePath).slice(1)};base64,${base64String}`;
+    res.status(200).json({ status: 200, success: true, message: 'Convert image to base64 successfully.', dataUrl })
 }
 
 const covertBase64ToImage = async (req, res) => {
     let { name, email, password, image } = req.body
     const user = await User.findOne({ email: email, isDeleted: 0 })
     if (user) {
-        throw new ConflictRequestException("An account already exists with this email address.")
+        return res.status(400).json({ status: 400, success: false, message: "An account already exists with this email address." })
     }
     password = bcrypt.hashSync(password, 10)
 
